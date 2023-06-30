@@ -26,52 +26,17 @@ class MyAppState extends State<MyApp> {
   static int _nextMediaId = 0;
   late AudioPlayer _player;
   final _playlist = ConcatenatingAudioSource(children: [
-    ClippingAudioSource(
-      start: const Duration(seconds: 60),
-      end: const Duration(seconds: 90),
-      child: AudioSource.uri(Uri.parse(
-          "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")),
-      tag: MediaItem(
-        id: '${_nextMediaId++}',
-        album: "Science Friday",
-        title: "A Salute To Head-Scratching Science (30 seconds)",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
-      ),
-    ),
     AudioSource.uri(
-      Uri.parse(
-          "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3"),
+      Uri.parse("http://radioactiva.globalradios.stream"),
       tag: MediaItem(
         id: '${_nextMediaId++}',
-        album: "Radio Activa",
-        title: "A Salute To Head-Scratching Science",
+        album: "Radio Activa 99.7 FM",
+        title: "La Mera Yema",
         artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
-      ),
-    ),
-    AudioSource.uri(
-      Uri.parse("https://s3.amazonaws.com/scifri-segments/scifri201711241.mp3"),
-      tag: MediaItem(
-        id: '${_nextMediaId++}',
-        album: "Science Friday",
-        title: "From Cat Rheology To Operatic Incompetence",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
-      ),
-    ),
-    AudioSource.uri(
-      Uri.parse("asset:///audio/nature.mp3"),
-      tag: MediaItem(
-        id: '${_nextMediaId++}',
-        album: "Public Domain",
-        title: "Nature Sounds",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
+            "https://cdn-profiles.tunein.com/s130686/images/bannerx.jpg?t=637894022620000000"),
       ),
     ),
   ]);
-  int _addedCount = 0;
 
   @override
   void initState() {
@@ -153,137 +118,12 @@ class MyAppState extends State<MyApp> {
                 ),
               ),
               ControlButtons(_player),
-              StreamBuilder<PositionData>(
-                stream: _positionDataStream,
-                builder: (context, snapshot) {
-                  final positionData = snapshot.data;
-                  return SeekBar(
-                    duration: positionData?.duration ?? Duration.zero,
-                    position: positionData?.position ?? Duration.zero,
-                    bufferedPosition:
-                        positionData?.bufferedPosition ?? Duration.zero,
-                    onChangeEnd: (newPosition) {
-                      _player.seek(newPosition);
-                    },
-                  );
-                },
-              ),
               const SizedBox(height: 8.0),
-              Row(
-                children: [
-                  StreamBuilder<LoopMode>(
-                    stream: _player.loopModeStream,
-                    builder: (context, snapshot) {
-                      final loopMode = snapshot.data ?? LoopMode.off;
-                      const icons = [
-                        Icon(Icons.repeat, color: Colors.grey),
-                        Icon(Icons.repeat, color: Colors.orange),
-                        Icon(Icons.repeat_one, color: Colors.orange),
-                      ];
-                      const cycleModes = [
-                        LoopMode.off,
-                        LoopMode.all,
-                        LoopMode.one,
-                      ];
-                      final index = cycleModes.indexOf(loopMode);
-                      return IconButton(
-                        icon: icons[index],
-                        onPressed: () {
-                          _player.setLoopMode(cycleModes[
-                              (cycleModes.indexOf(loopMode) + 1) %
-                                  cycleModes.length]);
-                        },
-                      );
-                    },
-                  ),
-                  Expanded(
-                    child: Text(
-                      "Playlist",
-                      style: Theme.of(context).textTheme.titleLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  StreamBuilder<bool>(
-                    stream: _player.shuffleModeEnabledStream,
-                    builder: (context, snapshot) {
-                      final shuffleModeEnabled = snapshot.data ?? false;
-                      return IconButton(
-                        icon: shuffleModeEnabled
-                            ? const Icon(Icons.shuffle, color: Colors.orange)
-                            : const Icon(Icons.shuffle, color: Colors.grey),
-                        onPressed: () async {
-                          final enable = !shuffleModeEnabled;
-                          if (enable) {
-                            await _player.shuffle();
-                          }
-                          await _player.setShuffleModeEnabled(enable);
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 240.0,
-                child: StreamBuilder<SequenceState?>(
-                  stream: _player.sequenceStateStream,
-                  builder: (context, snapshot) {
-                    final state = snapshot.data;
-                    final sequence = state?.sequence ?? [];
-                    return ReorderableListView(
-                      onReorder: (int oldIndex, int newIndex) {
-                        if (oldIndex < newIndex) newIndex--;
-                        _playlist.move(oldIndex, newIndex);
-                      },
-                      children: [
-                        for (var i = 0; i < sequence.length; i++)
-                          Dismissible(
-                            key: ValueKey(sequence[i]),
-                            background: Container(
-                              color: Colors.redAccent,
-                              alignment: Alignment.centerRight,
-                              child: const Padding(
-                                padding: EdgeInsets.only(right: 8.0),
-                                child: Icon(Icons.delete, color: Colors.white),
-                              ),
-                            ),
-                            onDismissed: (dismissDirection) {
-                              _playlist.removeAt(i);
-                            },
-                            child: Material(
-                              color: i == state!.currentIndex
-                                  ? Colors.grey.shade300
-                                  : null,
-                              child: ListTile(
-                                title: Text(sequence[i].tag.title as String),
-                                onTap: () {
-                                  _player.seek(Duration.zero, index: i);
-                                },
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ),
+              Expanded(
+                child: Container(color: Colors.transparent),
+              )
             ],
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {
-            _playlist.add(AudioSource.uri(
-              Uri.parse("asset:///audio/nature.mp3"),
-              tag: MediaItem(
-                id: '${_nextMediaId++}',
-                album: "Public Domain",
-                title: "Nature Sounds ${++_addedCount}",
-                artUri: Uri.parse(
-                    "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
-              ),
-            ));
-          },
         ),
       ),
     );
@@ -313,13 +153,6 @@ class ControlButtons extends StatelessWidget {
               onChanged: player.setVolume,
             );
           },
-        ),
-        StreamBuilder<SequenceState?>(
-          stream: player.sequenceStateStream,
-          builder: (context, snapshot) => IconButton(
-            icon: const Icon(Icons.skip_previous),
-            onPressed: player.hasPrevious ? player.seekToPrevious : null,
-          ),
         ),
         StreamBuilder<PlayerState>(
           stream: player.playerStateStream,
@@ -356,31 +189,6 @@ class ControlButtons extends StatelessWidget {
               );
             }
           },
-        ),
-        StreamBuilder<SequenceState?>(
-          stream: player.sequenceStateStream,
-          builder: (context, snapshot) => IconButton(
-            icon: const Icon(Icons.skip_next),
-            onPressed: player.hasNext ? player.seekToNext : null,
-          ),
-        ),
-        StreamBuilder<double>(
-          stream: player.speedStream,
-          builder: (context, snapshot) => IconButton(
-            icon: Text("${snapshot.data?.toStringAsFixed(1)}x",
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: () {
-              showSliderDialog(
-                context: context,
-                title: "Adjust speed",
-                divisions: 10,
-                min: 0.5,
-                max: 1.5,
-                stream: player.speedStream,
-                onChanged: player.setSpeed,
-              );
-            },
-          ),
         ),
       ],
     );
