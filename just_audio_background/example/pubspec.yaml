@@ -14,6 +14,7 @@ dependencies:
     path: ../../just_audio
   just_audio_background:
     path: ..
+  google_mobile_ads: ^3.0.0
 
 # Uncomment when testing platform interface changes.
 # dependency_overrides:

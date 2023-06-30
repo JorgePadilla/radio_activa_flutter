@@ -5,8 +5,13 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_example/common.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:io';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
@@ -38,6 +43,11 @@ class MyAppState extends State<MyApp> {
     ),
   ]);
 
+  BannerAd? _bannerAd;
+  final String _adUnitId = Platform.isAndroid
+      ? 'ca-app-pub-3940256099942544/6300978111'
+      : 'ca-app-pub-3940256099942544/2934735716';
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +56,28 @@ class MyAppState extends State<MyApp> {
       statusBarColor: Colors.black,
     ));
     _init();
+    _loadAd();
+  }
+
+  void _loadAd() async {
+    _bannerAd = BannerAd(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+        },
+        //...
+      ),
+    );
+
+    _bannerAd?.load();
   }
 
   Future<void> _init() async {
@@ -67,6 +99,7 @@ class MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    _bannerAd?.dispose();
     _player.dispose();
     super.dispose();
   }
@@ -121,7 +154,16 @@ class MyAppState extends State<MyApp> {
               const SizedBox(height: 8.0),
               Expanded(
                 child: Container(color: Colors.transparent),
-              )
+              ),
+              if (_bannerAd != null)
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ),
             ],
           ),
         ),
