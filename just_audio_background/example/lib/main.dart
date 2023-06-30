@@ -122,6 +122,7 @@ class MyAppState extends State<MyApp> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const Padding(padding: EdgeInsets.only(top: 200)),
               Expanded(
                 child: StreamBuilder<SequenceState?>(
                   stream: _player.sequenceStateStream,
@@ -136,7 +137,7 @@ class MyAppState extends State<MyApp> {
                       children: [
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(60.0),
                             child: Center(
                                 child:
                                     Image.network(metadata.artUri.toString())),
