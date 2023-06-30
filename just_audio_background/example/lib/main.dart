@@ -49,7 +49,7 @@ class MyAppState extends State<MyApp> {
         artUri: Uri.parse(
             "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
       ),
-    ),s
+    ),
     AudioSource.uri(
       Uri.parse("https://s3.amazonaws.com/scifri-segments/scifri201711241.mp3"),
       tag: MediaItem(
