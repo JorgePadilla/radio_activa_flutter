@@ -44,12 +44,12 @@ class MyAppState extends State<MyApp> {
           "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3"),
       tag: MediaItem(
         id: '${_nextMediaId++}',
-        album: "Science Friday",
+        album: "Radio Activa",
         title: "A Salute To Head-Scratching Science",
         artUri: Uri.parse(
             "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
       ),
-    ),
+    ),s
     AudioSource.uri(
       Uri.parse("https://s3.amazonaws.com/scifri-segments/scifri201711241.mp3"),
       tag: MediaItem(
