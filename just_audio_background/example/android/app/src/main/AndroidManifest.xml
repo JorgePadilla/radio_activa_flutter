@@ -14,7 +14,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:usesCleartextTraffic="true"
-        android:label="just_audio_example"
+        android:label="Radio Activa 99.7 FM"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
