@@ -45,7 +45,7 @@ class MyAppState extends State<MyApp> {
 
   BannerAd? _bannerAd;
   final String _adUnitId = Platform.isAndroid
-      ? 'ca-app-pub-3940256099942544/6300978111'
+      ? 'ca-app-pub-1170851332113980/2635310662'
       : 'ca-app-pub-3940256099942544/2934735716';
 
   @override
