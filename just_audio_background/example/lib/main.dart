@@ -44,6 +44,8 @@ class MyAppState extends State<MyApp> {
   ]);
 
   BannerAd? _bannerAd;
+  bool _isLoaded = false;
+
   final String _adUnitId = Platform.isAndroid
       ? 'ca-app-pub-1170851332113980/2635310662'
       : 'ca-app-pub-3940256099942544/2934735716';
@@ -56,28 +58,50 @@ class MyAppState extends State<MyApp> {
       statusBarColor: Colors.black,
     ));
     _init();
+    _isLoaded = false;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _loadAd();
   }
 
+  /// Dimensions of the ad are determined by the width of the screen.
   void _loadAd() async {
-    _bannerAd = BannerAd(
+    // Get an AnchoredAdaptiveBannerAdSize before loading the ad.
+    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.of(context).size.width.truncate());
+
+    if (size == null) {
+      // Unable to get width of anchored banner.
+      return;
+    }
+
+    BannerAd(
       adUnitId: _adUnitId,
       request: const AdRequest(),
-      size: AdSize.fullBanner,
+      size: size,
       listener: BannerAdListener(
+        // Called when an ad is successfully received.
         onAdLoaded: (ad) {
           setState(() {
             _bannerAd = ad as BannerAd;
+            _isLoaded = true;
           });
         },
+        // Called when an ad request failed.
         onAdFailedToLoad: (ad, err) {
           ad.dispose();
         },
-        //...
+        // Called when an ad opens an overlay that covers the screen.
+        onAdOpened: (Ad ad) {},
+        // Called when an ad removes an overlay that covers the screen.
+        onAdClosed: (Ad ad) {},
+        // Called when an impression occurs on the ad.
+        onAdImpression: (Ad ad) {},
       ),
-    );
-
-    _bannerAd?.load();
+    ).load();
   }
 
   Future<void> _init() async {
